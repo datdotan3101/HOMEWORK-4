@@ -33,11 +33,11 @@ class StaffList {
     }
     return null;
   }
-  update(info) {
+  update(staff) {
     // Tìm vị trí trong arr cần update
-    const index = this.findIndex(info.account);
+    const index = this.findIndex(staff.account);
     if (index !== -1) {
-      this.arr[index] = info;
+      this.arr[index] = staff;
     }
   }
 }

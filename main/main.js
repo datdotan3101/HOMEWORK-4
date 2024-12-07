@@ -1,9 +1,12 @@
 // Import Object
 import Staff from "./staff.js";
 import StaffList from "./staff_list.js";
+import Validation from "./validation.js";
 
 export const getEleId = (id) => document.getElementById(id);
 
+// Validation
+const validation = new Validation();
 /** Staff List */
 const staffList = new StaffList();
 
@@ -20,6 +23,65 @@ const getInfo = () => {
   const position = getEleId("chucvu").value;
   const workhours = getEleId("gioLam").value;
 
+  // Check validation
+  let isValid = true;
+  // account
+  isValid &=
+    validation.checkEmpty(account, "tbTKNV", "Please enter account!") &&
+    validation.checkAccountFormat(
+      account,
+      "tbTKNV",
+      "Account including 4 - 6 number"
+    );
+  // fullname
+  isValid &=
+    validation.checkEmpty(fullname, "tbTen", "Please enter fullname!") &&
+    validation.checkCharacterString(
+      fullname,
+      "tbTen",
+      "Please enter fullname by letter"
+    );
+  // email
+  isValid &=
+    validation.checkEmpty(email, "tbEmail", "Please enter email") &&
+    validation.checkEmailFormat(
+      email,
+      "tbEmail",
+      "Please enter correct email format"
+    );
+  // password
+  isValid &=
+    validation.checkEmpty(password, "tbMatKhau", "Please create passwork") &&
+    validation.checkEmailFormat(
+      password,
+      "tbMatKhau",
+      "Please enter Password 6-10 characters (contain at least 1 number, 1 uppercase letter, 1 special character), do not leave blank"
+    );
+  // daywork
+  isValid &= validation.checkEmpty(
+    daywork,
+    "tbNgay",
+    "Please choose day start"
+  );
+  // salary
+  isValid = validation.checkEmpty(
+    salary,
+    "tbLuongCB",
+    "Please enter basic salary"
+  );
+  // postion
+  isValid &= validation.checkSelect(
+    "chucvu",
+    "tbChucVu",
+    "Please choose position"
+  );
+  // workhours
+  isValid &= validation.checkEmpty(
+    workhours,
+    "tbGiolam",
+    "Please enter work hour"
+  );
+  if (!isValid) return null;
   // Staff Object
   const staff = new Staff(
     account,
@@ -92,6 +154,7 @@ getLocalStorage();
  */
 getEleId("btnThemNV").onclick = function () {
   const staff = getInfo();
+  if (!staff) return;
   staffList.addStaff(staff);
   renderStaffList(staffList.arr);
   // Set local storage
@@ -110,6 +173,13 @@ const handleDelete = (account) => {
  * Handle Edit
  */
 const handleEdit = (account) => {
+  // Title modal
+  getEleId("header-title").innerHTML = "Update";
+  // Hide button add
+  getEleId("btnThemNV").style.display = "none";
+  // Show button update
+  getEleId("btnCapNhat").style.display = "inline-block";
+  // close modal
   const staff = staffList.edit(account);
   if (staff) {
     getEleId("tknv").value = staff.account;
@@ -127,13 +197,32 @@ const handleEdit = (account) => {
  */
 getEleId("btnCapNhat").onclick = function () {
   // Get info
-  const info = getInfo();
+  const staff = getInfo();
+  if (!staff) return;
+
   // Update staff to staff list
-  staffList.update(info);
+  staffList.update(staff);
   // Render staff list
   renderStaffList(staffList.arr);
   // setLocalStorage
   setLocalStorage();
+  // Close modal
+  getEleId("btnDong")[0].click();
+};
+/**
+ * Add
+ */
+getEleId("btnThem").onclick = function () {
+  // Title modal
+  getEleId("header-title").innerHTML = "Log in";
+  // Show button Add
+  getEleId("btnThemNV").style.display = "inline-block";
+  // Hide button update
+  getEleId("btnCapNhat").style.display = "none";
+  // Reset form
+  document.getElementsByClassName("form").reset();
+  // Close modal
+  getEleId("btnDong")[0].click();
 };
 // Window
 window.handleDelete = handleDelete;
